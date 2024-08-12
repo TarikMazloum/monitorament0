@@ -1,0 +1,123 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Batimentos e Temperatura</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 300px;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background-color: #000;
+            color: #fff;
+        }
+        th, td {
+            border: 1px solid #fff;
+            text-align: center;
+            padding: 10px;
+        }
+        input {
+            width: 90%;
+            padding: 5px;
+            margin: 5px 0;
+            background-color: #fff;
+            color: #333;
+        }
+        button {
+            padding: 10px 20px;
+            margin-top: 10px;
+            background-color: #fff;
+            color: #333;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #ccc;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tabela de Batimentos e Temperatura</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Batimento Cardiaco (BPM)</th>
+                <th>Temperatura (°C)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="text-align: center;">
+        <form id="inputForm">
+            <label for="bpm">Batimento Cardiaco (BPM): </label>
+            <input type="number" id="bpm" name="bpm" required>
+            <label for="temp">Temperatura (°C): </label>
+            <input type="number" id="temp" name="temp" step="0.1" required>
+            <button type="submit">Enviar</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('inputForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            const bpm = parseFloat(document.getElementById('bpm').value);
+            const temp = parseFloat(document.getElementById('temp').value);
+            
+            let alertMessage = '';
+
+            if (temp < 35) {
+                alertMessage += 'Atenção: Temperatura abaixo do normal! ';
+            }
+
+            if (temp > 39) {
+                alertMessage += 'Atenção: Temperatura acima do normal! ';
+            }
+
+            if (bpm < 40 ) {
+                alertMessage += 'Atenção: Batimento cardíaco abaixo do normal!';
+            }
+
+            if (bpm > 125) {
+                alertMessage += 'Atenção: Batimento cardíaco acima do normal!';
+            }
+
+            if (alertMessage) {
+                alert(alertMessage);
+            }
+
+            const tbody = document.querySelector('table tbody');
+            const newRow = document.createElement('tr');
+            
+            const bpmCell = document.createElement('td');
+            bpmCell.textContent = bpm;
+            newRow.appendChild(bpmCell);
+            
+            const tempCell = document.createElement('td');
+            tempCell.textContent = temp;
+            newRow.appendChild(tempCell);
+            
+            tbody.appendChild(newRow);
+        });
+    </script>
+</body>
+</html>
+
+
+
