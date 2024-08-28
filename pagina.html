@@ -4,120 +4,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tabela de Batimentos e Temperatura</title>
+    <title>M87 - Monitoramento</title>
     <style>
+        @font-face {
+            font-family: 'Broken Console';
+            src: url('Broken Console Bold.ttf') format('truetype'),
+                 url('Broken Console Bold.otf') format('opentype');
+        }
+
         body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Broken Console', sans-serif;
+            background-color: #000;
+            color: white;
+        }
+
+        .container {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #000;
-            color: #fff;
-            font-family: Arial, sans-serif;
-        }
-        table {
-            width: 300px;
-            border-collapse: collapse;
-            margin: 20px 0;
-            background-color: #000;
-            color: #fff;
-        }
-        th, td {
-            border: 1px solid #fff;
-            text-align: center;
-            padding: 10px;
-        }
-        input {
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
             width: 90%;
-            padding: 5px;
-            margin: 5px 0;
-            background-color: #fff;
-            color: #333;
+            margin: 0 auto;
         }
-        button {
-            padding: 10px 20px;
-            margin-top: 10px;
-            background-color: #fff;
-            color: #333;
-            border: none;
-            cursor: pointer;
+
+        .header img {
+            max-width: 100;
+            height: 100px;
+            margin-left: 50;
+            justify-content: left;
+            align-items: flex-start;
         }
-        button:hover {
+
+        .values {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .values div {
+            text-align: center;
+            margin: 0 10px;
+        }
+
+        .values .box {
+            width: 300px;
+            height: 300px;
             background-color: #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+            font-size: 50px;
+            color: black;
+        }
+
+        .input-group {
+            margin-top: 20px;
+        }
+
+        .input-group input {
+            width: 100px;
+            padding: 10px;
+            font-size: 16px;
+            margin-right: 10px;
+            font-family: 'Broken Console', sans-serif;
+        }
+
+        .input-group button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Broken Console', sans-serif;
+            background-color: #444;
+            color: white;
+            border: none;
+        }
+
+        .legend {
+            display: flex;
+            align-items: center;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        .legend div {
+            display: flex;
+            align-items: center;
+            margin-right: 20px;
+        }
+
+        .legend .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        .green {
+            background-color: green;
+        }
+
+        .red {
+            background-color: red;
+        }
+
+        .blue {
+            background-color: blue;
         }
     </style>
 </head>
 <body>
-    <h1>Tabela de Batimentos e Temperatura</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Batimento Cardiaco (BPM)</th>
-                <th>Temperatura (°C)</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-            </tr>
-        </tbody>
-    </table>
+    <div class="container">
+        <div id="header">
+            <img src="./images/m87.png" alt="Logo M87">
+        </div>
+        <div class="values">
+            <div>
+                <h3>Temperatura (°C)</h3>
+                <div class="box" id="temp">--</div>
+            </div>
+            <div>
+                <h3>Oxigênio (O2)</h3>
+                <div class="box" id="oxigenio">--</div>
+            </div>
+            <div>
+                <h3>Batimento (Bpm)</h3>
+                <div class="box" id="batimento">--</div>
+            </div>
+        </div>
 
-    <div style="text-align: center;">
-        <form id="inputForm">
-            <label for="bpm">Batimento Cardiaco (BPM): </label>
-            <input type="number" id="bpm" name="bpm" required>
-            <label for="temp">Temperatura (°C): </label>
-            <input type="number" id="temp" name="temp" step="0.1" required>
-            <button type="submit">Enviar</button>
-        </form>
+        <div class="legend">
+            <div><div class="dot green"></div> Sinais normais</div>
+            <div><div class="dot red"></div> Sinais elevados</div>
+            <div><div class="dot blue"></div> Sinais abaixo do normal</div>
+        </div>
+
+        <div class="input-group">
+            <input type="number" id="tempInput" placeholder="Temperatura">
+            <button onclick="updateValue('temp', 'tempInput', 'temp')">Atualizar Temperatura</button>
+        </div>
+        <div class="input-group">
+            <input type="number" id="oxigenioInput" placeholder="Oxigênio">
+            <button onclick="updateValue('oxigenio', 'oxigenioInput', 'oxigenio')">Atualizar Oxigênio</button>
+        </div>
+        <div class="input-group">
+            <input type="number" id="batimentoInput" placeholder="Batimento">
+            <button onclick="updateValue('batimento', 'batimentoInput', 'batimento')">Atualizar Batimento</button>
+        </div>
     </div>
 
     <script>
-        document.getElementById('inputForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-            
-            const bpm = parseFloat(document.getElementById('bpm').value);
-            const temp = parseFloat(document.getElementById('temp').value);
-            
-            let alertMessage = '';
+        function updateValue(elementId, inputId, type) {
+            const inputValue = parseFloat(document.getElementById(inputId).value);
+            const element = document.getElementById(elementId);
 
-            if (temp < 35) {
-                alertMessage += 'Atenção: Temperatura abaixo do normal! ';
+            if (!isNaN(inputValue)) {
+                element.innerText = inputValue;
+
+                switch (type) {
+                    case 'temp':
+                        if (inputValue < 35.9) {
+                            element.style.color = 'blue';
+                        } else if (inputValue > 37.4) {
+                            element.style.color = 'red';
+                        } else {
+                            element.style.color = 'green';
+                        }
+                        break;
+
+                    case 'oxigenio':
+                        if (inputValue < 94.9) {
+                            element.style.color = 'blue';
+                        } else if (inputValue > 101) {
+                            element.style.color = 'red';
+                        } else {
+                            element.style.color = 'green';
+                        }
+                        break;
+
+                    case 'batimento':
+                        if (inputValue < 59) {
+                            element.style.color = 'blue';
+                        } else if (inputValue > 101) {
+                            element.style.color = 'red';
+                        } else {
+                            element.style.color = 'green';
+                        }
+                        break;
+                }
+            } else {
+                alert('Por favor, insira um valor válido.');
             }
-
-            if (temp > 39) {
-                alertMessage += 'Atenção: Temperatura acima do normal! ';
-            }
-
-            if (bpm < 40 ) {
-                alertMessage += 'Atenção: Batimento cardíaco abaixo do normal!';
-            }
-
-            if (bpm > 125) {
-                alertMessage += 'Atenção: Batimento cardíaco acima do normal!';
-            }
-
-            if (alertMessage) {
-                alert(alertMessage);
-            }
-
-            const tbody = document.querySelector('table tbody');
-            const newRow = document.createElement('tr');
-            
-            const bpmCell = document.createElement('td');
-            bpmCell.textContent = bpm;
-            newRow.appendChild(bpmCell);
-            
-            const tempCell = document.createElement('td');
-            tempCell.textContent = temp;
-            newRow.appendChild(tempCell);
-            
-            tbody.appendChild(newRow);
-        });
+        }
     </script>
 </body>
 </html>
-
-
-

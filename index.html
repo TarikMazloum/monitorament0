@@ -1,115 +1,185 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>M87 - Leitura de Dados</title>
+    <title>Painel de Sinais Vitais - Projeto M87</title>
     <style>
         @font-face {
             font-family: 'Broken Console';
-            src: url('Broken Console Bold.ttf') format('truetype'),
-                 url('Broken Console Bold.otf') format('opentype');
+            src: url('Broken Console Bold.ttf') format('truetype');
         }
-        /* Ajusta para uma tela maior sem barras de rolagem */
-        body, html {
+
+        body {
+            background-color: black;
+            color: white;
+            font-family: 'Broken Console', sans-serif;
+            text-align: center;
             margin: 0;
             padding: 0;
-            height: 100%;
-            overflow: hidden;
         }
-        body {
-            background-color: #000;
-            color: #fff;
-            font-family: 'Broken Console', sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
+
         .header {
+            display: flex;
+            align-items: center;
             width: 100%;
-            background-color: #000;
-            padding: 10px;
-            text-align: left; 
         }
-        .header img {
-            width: 30%; 
-        }
+
         .container {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             align-items: center;
             width: 90%;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+
+        .info-container {
+            display: flex;
+            justify-content: center;
             margin-top: 40px;
         }
-        .data-box-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+
+        .info-box {
+            flex: 1;
+            text-align: center;
+            margin: 0 10px;
         }
-        .label {
-            margin-bottom: 20px;
-            font-size: 1.5em; 
+
+        .info-box h2 {
+            margin-bottom: 10px;
         }
-        .data-box {
-            width: 250px;
-            height: 250px;
-            background-color: #d3d3d3;
-            color: #000;
+
+        .box {
+            width: 300px;
+            height: 300px;
+            background-color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 3em; 
+            font-size: 3rem;
+            margin: 0 auto;
         }
-        .footer {
-            width: 100%;
+
+        .gabarito {
+            margin-top: 20px;
+            text-align: left;
+            display: inline-block;
+        }
+
+        .gabarito span {
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .gabarito span::before {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        .verde::before {
+            background-color: green;
+        }
+
+        .vermelho::before {
+            background-color: red;
+        }
+
+        .azul::before {
+            background-color: blue;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            border-top: 1px solid white;
+            padding-top: 10px;
             text-align: center;
-            padding: 20px;
-            font-size: 1em;
-            border-top: 1px solid #fff;
-            margin-top: 40px;
         }
     </style>
 </head>
 <body>
+        <div class="header">
+            <img src="./images/m87.png" alt="M87">
+        </div>
 
-    <div class="header">
-        <img src="images/m87.png" alt="M87">
+    <div class="info-container">
+        <div class="info-box">
+            <h2>Temperatura (°C)</h2>
+            <div class="box" id="temperatura">--</div>
+            <div class="gabarito">
+                <span class="verde">Sinais normais</span>
+                <span class="vermelho">Sinais elevados</span>
+                <span class="azul">Sinais abaixo do normal</span>
+            </div>
+        </div>
+        <div class="info-box">
+            <h2>Oxigênio (O2)</h2>
+            <div class="box" id="oxigenio">--</div>
+        </div>
+        <div class="info-box">
+            <h2>Batimento (Bpm)</h2>
+            <div class="box" id="batimento">--</div>
+        </div>
     </div>
 
-    <div class="container">
-        <div class="data-box-wrapper">
-            <div class="label">Temperatura (°C)</div>
-            <div class="data-box" id="temp"></div>
-        </div>
-        <div class="data-box-wrapper">
-            <div class="label">Oxigênio (O2)</div>
-            <div class="data-box" id="oxigenio"></div>
-        </div>
-        <div class="data-box-wrapper">
-            <div class="label">Batimento (Bpm)</div>
-            <div class="data-box" id="batimento"></div>
-        </div>
-    </div>
-
-    <div class="footer">
+    <footer>
         Versão 0.1 - 1EMA Projeto M87
-    </div>
+    </footer>
 
     <script>
-        // Função para ler o arquivo .txt no backend
-        fetch("dados.txt")
-            .then(response => response.text())
-            .then(data => {
-                const lines = data.trim().split('\n');
-                const lastThreeLines = lines.slice(-3);
-                document.getElementById('temp').innerText = lastThreeLines[0].trim();
-                document.getElementById('oxigenio').innerText = lastThreeLines[1].trim();
-                document.getElementById('batimento').innerText = lastThreeLines[2].trim();
-            })
-            .catch(error => console.error('Erro ao ler o arquivo:', error));
-    </script>
+        function updateValues() {
+            fetch('dados.txt')
+                .then(response => response.text())
+                .then(data => {
+                    const lines = data.trim().split('\n');
+                    const lastLines = lines.slice(-3);
 
+                    const temperatura = parseFloat(lastLines[0]);
+                    const oxigenio = parseFloat(lastLines[1]);
+                    const batimento = parseFloat(lastLines[2]);
+
+                    document.getElementById('temperatura').textContent = temperatura.toFixed(1);
+                    document.getElementById('oxigenio').textContent = oxigenio.toFixed(1);
+                    document.getElementById('batimento').textContent = batimento.toFixed(1);
+
+                    if (temperatura < 35.9) {
+                        document.getElementById('temperatura').style.color = 'blue';
+                    } else if (temperatura > 37.4) {
+                        document.getElementById('temperatura').style.color = 'red';
+                    } else {
+                        document.getElementById('temperatura').style.color = 'green';
+                    }
+
+                    if (oxigenio < 94.9) {
+                        document.getElementById('oxigenio').style.color = 'blue';
+                    } else if (oxigenio > 100) {
+                        document.getElementById('oxigenio').style.color = 'red';
+                    } else {
+                        document.getElementById('oxigenio').style.color = 'green';
+                    }
+
+                    if (batimento < 59) {
+                        document.getElementById('batimento').style.color = 'blue';
+                    } else if (batimento > 101) {
+                        document.getElementById('batimento').style.color = 'red';
+                    } else {
+                        document.getElementById('batimento').style.color = 'green';
+                    }
+                });
+        }
+
+        updateValues();
+        setInterval(updateValues, 5000);
+    </script>
 </body>
 </html>
+
+
 
